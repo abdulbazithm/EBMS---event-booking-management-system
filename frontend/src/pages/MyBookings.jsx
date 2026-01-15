@@ -1,11 +1,14 @@
 import { useEffect, useState } from "react";
 import api from "../services/api";
+import "../styles/bookings.css"; // ✅ page styles
 
 function MyBookings() {
   const [bookings, setBookings] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
+
   const [cancelLoading, setCancelLoading] = useState(null);
+  const [successMsg, setSuccessMsg] = useState("");
 
   const fetchBookings = async () => {
     try {
@@ -24,56 +27,81 @@ function MyBookings() {
   }, []);
 
   const handleCancel = async (bookingId) => {
+    if (cancelLoading) return;
+
     setCancelLoading(bookingId);
+    setError("");
+    setSuccessMsg("");
 
     try {
       await api.post(`/bookings/bookings/${bookingId}/cancel/`);
-      // Refresh list after cancel
+      setSuccessMsg("✅ Booking cancelled successfully.");
       fetchBookings();
     } catch (err) {
-      console.error("CANCEL BOOKING ERROR:", err.response);
-      alert("Failed to cancel booking");
+      setError("❌ Failed to cancel booking.");
     } finally {
       setCancelLoading(null);
     }
   };
 
-  if (loading) return <p>Loading your bookings...</p>;
-  if (error) return <p style={{ color: "red" }}>{error}</p>;
+  if (loading) return <p className="text-center">Loading your bookings...</p>;
+  if (error && bookings.length === 0)
+    return <p className="text-center text-error">{error}</p>;
 
   return (
-    <div>
-      <h2>My Bookings</h2>
+    <div className="container">
+      <h2 className="mb-20">🎟️ My Bookings</h2>
 
-      {bookings.length === 0 && <p>You have no bookings yet.</p>}
+      {successMsg && <p className="text-success">{successMsg}</p>}
+      {error && <p className="text-error">{error}</p>}
 
-      <ul>
-        {bookings.map((booking) => (
-          <li key={booking.id} style={{ marginBottom: "20px" }}>
-            <strong>Event ID:</strong> {booking.event}
-            <br />
-            <strong>Event:</strong> {booking.event_title}
-            <br />
-            <strong>Tickets:</strong> {booking.tickets}
-            <br />
-            <strong>Status:</strong> {booking.status}
-            <br />
-            <strong>Booked At:</strong>{" "}
-            {new Date(booking.booking_time).toLocaleString()}
-            <br />
+      {bookings.length === 0 ? (
+        <p>You have no bookings yet.</p>
+      ) : (
+        <div className="booking-grid">
+          {bookings.map((booking) => (
+            <div className="card booking-card" key={booking.id}>
+              <h3 className="booking-title">
+                {booking.event_title}
+              </h3>
 
-            {booking.status === "BOOKED" && (
-              <button
-                onClick={() => handleCancel(booking.id)}
-                disabled={cancelLoading === booking.id}
-                style={{ marginTop: "5px" }}
-              >
-                {cancelLoading === booking.id ? "Cancelling..." : "Cancel Booking"}
-              </button>
-            )}
-          </li>
-        ))}
-      </ul>
+              <p>
+                <strong>Tickets:</strong> {booking.tickets}
+              </p>
+
+              <p>
+                <strong>Status:</strong>{" "}
+                <span
+                  className={
+                    booking.status === "BOOKED"
+                      ? "status-active"
+                      : "status-cancelled"
+                  }
+                >
+                  {booking.status}
+                </span>
+              </p>
+
+              <p className="booking-time">
+                <strong>Booked At:</strong>{" "}
+                {new Date(booking.booking_time).toLocaleString()}
+              </p>
+
+              {booking.status === "BOOKED" && (
+                <button
+                  onClick={() => handleCancel(booking.id)}
+                  disabled={cancelLoading === booking.id}
+                  className="mt-10"
+                >
+                  {cancelLoading === booking.id
+                    ? "Cancelling..."
+                    : "Cancel Booking"}
+                </button>
+              )}
+            </div>
+          ))}
+        </div>
+      )}
     </div>
   );
 }

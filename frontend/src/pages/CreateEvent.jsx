@@ -1,19 +1,20 @@
-import { useEffect, useState } from "react";   // 🔹 useEffect added for fetching categories
+import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import api from "../services/api";
+import "../styles/create-event.css";
 
 function CreateEvent() {
   const navigate = useNavigate();
 
-  //  State to store categories from backend
+  // 🔹 Categories
   const [categories, setCategories] = useState([]);
 
-
+  // 🔹 Form state
   const [formData, setFormData] = useState({
     title: "",
     description: "",
     location: "",
-    category: "",       //  Will store selected category ID
+    category: "",
     event_date: "",
     event_time: "",
     total_seats: "",
@@ -22,15 +23,13 @@ function CreateEvent() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
 
-
+  // 🔹 Fetch categories
   useEffect(() => {
     const fetchCategories = async () => {
       try {
         const response = await api.get("/events/categories/");
-        // 🔹 IMPORTANT FIX: use response.data.results (pagination-safe)
         setCategories(response.data.results || []);
       } catch (err) {
-        console.error("CATEGORY FETCH ERROR:", err.response);
         setError("Failed to load categories");
       }
     };
@@ -38,7 +37,7 @@ function CreateEvent() {
     fetchCategories();
   }, []);
 
-  // 🔹 Handles all input changes
+  // 🔹 Handle input change
   const handleChange = (e) => {
     setFormData({
       ...formData,
@@ -46,7 +45,7 @@ function CreateEvent() {
     });
   };
 
-  // 🔹 Submit form → create event
+  // 🔹 Submit form
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
@@ -55,15 +54,12 @@ function CreateEvent() {
     try {
       await api.post("/events/create/", {
         ...formData,
-        // 🔹 Backend expects numbers for FK & seats
         category: Number(formData.category),
         total_seats: Number(formData.total_seats),
       });
 
-      alert("🎉 Event created successfully!");
-      navigate("/organizer/events"); // redirect to organizer events
+      navigate("/organizer/events");
     } catch (err) {
-      console.error("CREATE EVENT ERROR:", err.response?.data);
       setError("Failed to create event. Please check all fields.");
     } finally {
       setLoading(false);
@@ -71,14 +67,14 @@ function CreateEvent() {
   };
 
   return (
-    <div>
-      <h2>Create New Event</h2>
+    <div className="container">
+      <div className="card create-event-card">
+        <h2 className="mb-20">🧑‍💼 Create New Event</h2>
 
-      {error && <p style={{ color: "red" }}>{error}</p>}
+        {error && <p className="text-error">{error}</p>}
 
-      <form onSubmit={handleSubmit}>
-        {/* Event Title */}
-        <div>
+        <form onSubmit={handleSubmit} className="create-event-form">
+          {/* Title */}
           <input
             type="text"
             name="title"
@@ -87,10 +83,8 @@ function CreateEvent() {
             onChange={handleChange}
             required
           />
-        </div>
 
-        {/* Description */}
-        <div>
+          {/* Description */}
           <textarea
             name="description"
             placeholder="Event Description"
@@ -98,10 +92,8 @@ function CreateEvent() {
             onChange={handleChange}
             required
           />
-        </div>
 
-        {/* Location */}
-        <div>
+          {/* Location */}
           <input
             type="text"
             name="location"
@@ -110,10 +102,8 @@ function CreateEvent() {
             onChange={handleChange}
             required
           />
-        </div>
 
-        {/* 🔹 UPDATED: CATEGORY DROPDOWN (instead of manual ID input) */}
-        <div>
+          {/* Category */}
           <select
             name="category"
             value={formData.category}
@@ -121,40 +111,33 @@ function CreateEvent() {
             required
           >
             <option value="">Select Category</option>
-
-            {/* 🔹 Populate dropdown dynamically */}
             {categories.map((cat) => (
               <option key={cat.id} value={cat.id}>
                 {cat.name}
               </option>
             ))}
           </select>
-        </div>
 
-        {/* Event Date */}
-        <div>
-          <input
-            type="date"
-            name="event_date"
-            value={formData.event_date}
-            onChange={handleChange}
-            required
-          />
-        </div>
+          {/* Date & Time */}
+          <div className="form-row">
+            <input
+              type="date"
+              name="event_date"
+              value={formData.event_date}
+              onChange={handleChange}
+              required
+            />
 
-        {/* Event Time */}
-        <div>
-          <input
-            type="time"
-            name="event_time"
-            value={formData.event_time}
-            onChange={handleChange}
-            required
-          />
-        </div>
+            <input
+              type="time"
+              name="event_time"
+              value={formData.event_time}
+              onChange={handleChange}
+              required
+            />
+          </div>
 
-        {/* Total Seats */}
-        <div>
+          {/* Seats */}
           <input
             type="number"
             name="total_seats"
@@ -163,14 +146,13 @@ function CreateEvent() {
             onChange={handleChange}
             required
           />
-        </div>
 
-        <br />
-
-        <button type="submit" disabled={loading}>
-          {loading ? "Creating..." : "Create Event"}
-        </button>
-      </form>
+          {/* Submit */}
+          <button type="submit" disabled={loading}>
+            {loading ? "Creating..." : "Create Event"}
+          </button>
+        </form>
+      </div>
     </div>
   );
 }

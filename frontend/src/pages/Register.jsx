@@ -13,6 +13,7 @@ function Register() {
   });
 
   const [error, setError] = useState("");
+  const [success, setSuccess] = useState("");
   const [loading, setLoading] = useState(false);
 
   const handleChange = (e) => {
@@ -26,8 +27,12 @@ function Register() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+
+    if (loading) return; // 🛡️ prevent double submit
+
     setLoading(true);
     setError("");
+    setSuccess("");
 
     try {
       const payload = {
@@ -37,53 +42,59 @@ function Register() {
         register_as_organizer: formData.register_as_organizer,
       };
 
-      console.log("REGISTER PAYLOAD:", payload); // 🔥 DEBUG
-
       await api.post("/accounts/register/", payload);
 
-      alert(
+      setSuccess(
         formData.register_as_organizer
-          ? "Organizer request submitted for approval."
-          : "Registration successful. Please login."
+          ? "✅ Organizer request submitted. Await admin approval."
+          : "✅ Registration successful! Redirecting to login..."
       );
 
-      navigate("/login");
+      setTimeout(() => {
+        navigate("/login");
+      }, 1500);
     } catch (err) {
-      console.error("REGISTER ERROR:", err.response?.data);
-      setError("Registration failed. Try again.");
+      setError("❌ Registration failed. Please try again.");
     } finally {
       setLoading(false);
     }
   };
 
   return (
-    <div>
+    <div style={{ maxWidth: "450px", margin: "40px auto" }}>
       <h2>Register</h2>
 
       {error && <p style={{ color: "red" }}>{error}</p>}
+      {success && <p style={{ color: "green" }}>{success}</p>}
 
       <form onSubmit={handleSubmit}>
         <input
           name="username"
           placeholder="Username"
+          value={formData.username}
           onChange={handleChange}
           required
+          disabled={loading}
         />
 
         <input
           name="email"
           type="email"
           placeholder="Email"
+          value={formData.email}
           onChange={handleChange}
           required
+          disabled={loading}
         />
 
         <input
           name="password"
           type="password"
           placeholder="Password"
+          value={formData.password}
           onChange={handleChange}
           required
+          disabled={loading}
         />
 
         <label>
@@ -92,7 +103,8 @@ function Register() {
             name="register_as_organizer"
             checked={formData.register_as_organizer}
             onChange={handleChange}
-          />
+            disabled={loading}
+          />{" "}
           Register as Organizer (admin approval required)
         </label>
 
@@ -103,7 +115,7 @@ function Register() {
         </button>
       </form>
 
-      <p>
+      <p style={{ marginTop: "15px" }}>
         Already have an account? <Link to="/login">Login</Link>
       </p>
     </div>

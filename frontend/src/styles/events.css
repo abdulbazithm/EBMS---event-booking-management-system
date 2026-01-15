@@ -1,0 +1,61 @@
+/* =========================
+   EVENTS GRID
+   ========================= */
+
+.event-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 20px;
+}
+
+/* =========================
+   EVENT CARD
+   ========================= */
+
+.event-card {
+  padding: 0;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+
+/* Poster / Banner */
+.event-poster {
+  height: 15px;
+  border-radius: 10px;
+  background: linear-gradient(135deg, #d32f2f, #f44336);
+  color: white;
+  font-weight: bold;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  letter-spacing: 1px;
+}
+
+/* Content */
+.event-content {
+  padding: 15px;
+  flex-grow: 1;
+}
+
+.event-content p {
+  margin: 6px 0;
+}
+
+.seats {
+  margin-top: 10px;
+}
+
+/* CTA */
+.event-cta {
+  display: block;
+  text-align: center;
+  background-color: #d32f2f;
+  color: white;
+  padding: 12px;
+  font-weight: bold;
+}
+
+.event-cta:hover {
+  background-color: #b71c1c;
+}

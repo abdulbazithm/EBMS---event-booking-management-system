@@ -1,0 +1,41 @@
+/* =========================
+   BOOKINGS GRID
+   ========================= */
+
+.booking-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+  gap: 20px;
+}
+
+/* =========================
+   BOOKING CARD
+   ========================= */
+
+.booking-card {
+  display: flex;
+  flex-direction: column;
+}
+
+.booking-title {
+  margin-bottom: 10px;
+}
+
+/* =========================
+   STATUS BADGES
+   ========================= */
+
+.status-active {
+  color: #2e7d32;
+  font-weight: 600;
+}
+
+.status-cancelled {
+  color: #c62828;
+  font-weight: 600;
+}
+
+.booking-time {
+  font-size: 14px;
+  color: #666;
+}

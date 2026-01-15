@@ -2,6 +2,7 @@ import { Link, useNavigate } from "react-router-dom";
 import { useEffect, useState } from "react";
 import { logout } from "../utils/auth";
 import { getMe } from "../services/auth";
+import "../styles/navbar.css";
 
 function Navbar() {
   const navigate = useNavigate();
@@ -27,37 +28,47 @@ function Navbar() {
   };
 
   return (
-    <nav style={{ padding: "10px", borderBottom: "1px solid #ddd" }}>
-      {isLoggedIn && (
-        <>
-          <Link to="/" style={{ marginRight: "15px" }}>Home</Link>
-          <Link to="/events" style={{ marginRight: "15px" }}>Events</Link>
-          <Link to="/bookings" style={{ marginRight: "15px" }}>My Bookings</Link>
+    <nav className="navbar">
+      <div className="navbar-container">
+        {/* 🔴 LOGO */}
+        <Link to="/" className="navbar-logo">
+          🎟️ EBMS
+        </Link>
 
-          {/* 🔐 Organizer/Admin only */}
-          {(user?.is_organizer || user?.is_admin) && (
+        {/* 🔗 LINKS */}
+        <div className="navbar-links">
+          {isLoggedIn && (
             <>
-              <Link to="/organizer/create-event" style={{ marginRight: "15px" }}>
-                Create Event
-              </Link>
-              <Link to="/organizer/events" style={{ marginRight: "15px" }}>
-                Organizer
-              </Link>
-                <Link to="/organizer/dashboard" style={{ marginRight: "15px" }}>
-                    Dashboard
-              </Link>
+              <Link to="/">Home</Link>
+
+              {/* 👤 NORMAL USER */}
+              {!user?.is_organizer && (
+                <>
+                  <Link to="/events">Events</Link>
+                  <Link to="/bookings">My Bookings</Link>
+                </>
+              )}
+
+              {/* 🧑‍💼 ORGANIZER */}
+              {user?.is_organizer && (
+                <>
+                  <Link to="/organizer/events">My Events</Link>
+                  <Link to="/organizer/create-event">Create Event</Link>
+                  <Link to="/organizer/dashboard">Dashboard</Link>
+                </>
+              )}
             </>
           )}
-        </>
-      )}
 
-      {!isLoggedIn && (
-        <Link to="/login" style={{ marginRight: "15px" }}>Login</Link>
-      )}
+          {!isLoggedIn && <Link to="/login">Login</Link>}
 
-      {isLoggedIn && (
-        <button onClick={handleLogout}>Logout</button>
-      )}
+          {isLoggedIn && (
+            <button onClick={handleLogout} className="btn-logout">
+              Logout
+            </button>
+          )}
+        </div>
+      </div>
     </nav>
   );
 }

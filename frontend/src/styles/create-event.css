@@ -1,0 +1,21 @@
+.create-event-card {
+  max-width: 600px;
+  margin: 0 auto;
+}
+
+.create-event-form textarea {
+  min-height: 100px;
+  resize: vertical;
+}
+
+/* Date & Time Row */
+.form-row {
+  display: flex;
+  gap: 12px;
+}
+
+@media (max-width: 600px) {
+  .form-row {
+    flex-direction: column;
+  }
+}

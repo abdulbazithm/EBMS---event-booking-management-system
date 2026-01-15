@@ -1,0 +1,70 @@
+/* =========================
+   NAVBAR BASE
+   ========================= */
+
+.navbar {
+  background-color: #ffffff;
+  border-bottom: 1px solid #ddd;
+  position: sticky;
+  top: 0;
+  z-index: 100;
+}
+
+/* =========================
+   LAYOUT
+   ========================= */
+
+.navbar-container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 12px 15px;
+
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+/* =========================
+   LOGO
+   ========================= */
+
+.navbar-logo {
+  font-size: 20px;
+  font-weight: bold;
+  color: #d32f2f;
+}
+
+/* =========================
+   LINKS
+   ========================= */
+
+.navbar-links {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.navbar-links a {
+  font-weight: 500;
+  color: #333;
+}
+
+.navbar-links a:hover {
+  color: #d32f2f;
+}
+
+/* =========================
+   LOGOUT BUTTON
+   ========================= */
+
+.btn-logout {
+  background: none;
+  border: none;
+  font-weight: 500;
+  cursor: pointer;
+  color: #0c0c0c;
+}
+
+.btn-logout:hover {
+  color: #f1f1e9;
+}

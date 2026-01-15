@@ -1,0 +1,22 @@
+.organizer-event-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 20px;
+}
+
+.organizer-event-card {
+  display: flex;
+  flex-direction: column;
+}
+
+.organizer-event-card h3 {
+  margin-bottom: 8px;
+}
+
+.organizer-event-card p {
+  margin: 6px 0;
+}
+
+.seats {
+  margin-top: 8px;
+}

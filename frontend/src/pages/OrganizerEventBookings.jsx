@@ -1,9 +1,10 @@
 import { useEffect, useState } from "react";
 import { useParams, Link } from "react-router-dom";
 import api from "../services/api";
+import "../styles/organizer-bookings.css";
 
 function OrganizerEventBookings() {
-  const { id } = useParams(); // event-id
+  const { id } = useParams();
   const [bookings, setBookings] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
@@ -16,7 +17,6 @@ function OrganizerEventBookings() {
         );
         setBookings(response.data.results || response.data);
       } catch (err) {
-        console.error("ORGANIZER BOOKINGS ERROR:", err.response);
         setError("Failed to load bookings for this event");
       } finally {
         setLoading(false);
@@ -26,31 +26,51 @@ function OrganizerEventBookings() {
     fetchBookings();
   }, [id]);
 
-  if (loading) return <p>Loading event bookings...</p>;
-  if (error) return <p style={{ color: "red" }}>{error}</p>;
+  if (loading) return <p className="text-center">Loading event bookings...</p>;
+  if (error) return <p className="text-center text-error">{error}</p>;
 
   return (
-    <div>
-      <h2>Event Bookings (Organizer)</h2>
+    <div className="container">
+      <Link to="/organizer/events" className="mb-20" id="back-events">
+        ← Back to My Events
+      </Link>
 
-      <Link to="/organizer/events">← Back to My Events</Link>
+      <h2 className="mb-20">📋 Event Bookings</h2>
 
-      <br /><br />
-
-      {bookings.length === 0 && <p>No bookings for this event.</p>}
-
-      <ul>
-        {bookings.map((booking) => (
-          <li key={booking.id} style={{ marginBottom: "15px" }}>
-            <strong>User:</strong> {booking.user.username} <br />
-            <strong>Email:</strong> {booking.user.email} <br />
-            <strong>Tickets:</strong> {booking.tickets} <br />
-            <strong>Status:</strong> {booking.status} <br />
-            <strong>Booked At:</strong>{" "}
-            {new Date(booking.booking_time).toLocaleString()}
-          </li>
-        ))}
-      </ul>
+      {bookings.length === 0 ? (
+        <p>No bookings for this event yet.</p>
+      ) : (
+        <div className="organizer-booking-grid">
+          {bookings.map((booking) => (
+            <div key={booking.id} className="card booking-card">
+              <p>
+                <strong>User:</strong> {booking.user.username}
+              </p>
+              <p>
+                <strong>Email:</strong> {booking.user.email}
+              </p>
+              <p>
+                <strong>Tickets:</strong> {booking.tickets}
+              </p>
+              <p>
+                <strong>Status:</strong>{" "}
+                <span
+                  className={
+                    booking.status === "BOOKED"
+                      ? "status-active"
+                      : "status-cancelled"
+                  }
+                >
+                  {booking.status}
+                </span>
+              </p>
+              <p className="booking-time">
+                {new Date(booking.booking_time).toLocaleString()}
+              </p>
+            </div>
+          ))}
+        </div>
+      )}
     </div>
   );
 }
