@@ -5,6 +5,8 @@ from django.utils.text import slugify
 from django.utils import timezone
 from datetime import datetime
 
+from django.core.exceptions import ValidationError
+
 
 User = settings.AUTH_USER_MODEL
 
@@ -50,11 +52,7 @@ class Event(models.Model):
     total_seats = models.PositiveIntegerField()
     booked_seats = models.PositiveIntegerField(default=0)
 
-    image = models.ImageField(
-        upload_to='events/',
-        blank=True,
-        null=True
-    )
+    image = models.ImageField(upload_to='events/', blank=True, null=True)
 
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
@@ -65,13 +63,14 @@ class Event(models.Model):
     def is_sold_out(self):
         return self.available_seats() <= 0
 
+    def is_past_event(self):
+        event_datetime = datetime.combine(self.event_date, self.event_time)
+        return event_datetime < timezone.now()
+
+    def clean(self):
+        if self.booked_seats > self.total_seats:
+            raise ValidationError("Booked seats cannot exceed total seats.")
+
     def __str__(self):
         return self.title
 
-def is_past_event(self):
-    event_datetime = datetime.combine(self.event_date, self.event_time)
-    return event_datetime < timezone.now()
-
-def clean(self):
-    if self.booked_seats > self.total_seats:
-        raise ValidationError("Booked seats cannot exceed total seats.")

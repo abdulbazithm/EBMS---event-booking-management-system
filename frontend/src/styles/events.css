@@ -17,25 +17,65 @@
   overflow: hidden;
   display: flex;
   flex-direction: column;
+  border-radius: 10px;
 }
 
-/* Poster / Banner */
+/* =========================
+   POSTER / BANNER
+   ========================= */
+
 .event-poster {
-  height: 15px;
-  border-radius: 10px;
-  background: linear-gradient(135deg, #d32f2f, #f44336);
-  color: white;
-  font-weight: bold;
+  position: relative;
+  height: 70px; /* 🔥 FIX: real banner height */
+  background: linear-gradient(135deg, #1e3a8a, #f44336);
   display: flex;
   align-items: center;
   justify-content: center;
-  letter-spacing: 1px;
 }
 
-/* Content */
+/* =========================
+   STATUS BADGE
+   ========================= */
+
+.event-status {
+  position: absolute;
+  top: 10px;
+  left: 10px;
+  padding: 6px 10px;
+  font-size: 12px;
+  font-weight: bold;
+  color: white;
+  border-radius: 4px;
+  text-transform: uppercase;
+}
+
+/* 🟢 Upcoming */
+.status-upcoming {
+  background-color: #2e7d32;
+}
+
+/* 🟡 Sold Out */
+.status-soldout {
+  background-color: #f9a825;
+}
+
+/* 🔴 Event Over */
+.status-over {
+  background-color: #f01919;
+}
+
+/* =========================
+   EVENT CONTENT
+   ========================= */
+
 .event-content {
   padding: 15px;
   flex-grow: 1;
+}
+
+.event-content h3 {
+  margin-top: 0;
+  margin-bottom: 8px;
 }
 
 .event-content p {
@@ -46,7 +86,10 @@
   margin-top: 10px;
 }
 
-/* CTA */
+/* =========================
+   CTA BUTTON
+   ========================= */
+
 .event-cta {
   display: block;
   text-align: center;
@@ -54,6 +97,7 @@
   color: white;
   padding: 12px;
   font-weight: bold;
+  text-decoration: none;
 }
 
 .event-cta:hover {

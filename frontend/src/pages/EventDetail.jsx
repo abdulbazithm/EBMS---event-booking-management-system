@@ -9,12 +9,12 @@ function EventDetail() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
 
-  const [tickets, setTickets] = useState(1); // 🎟️ ticket counter
+  const [tickets, setTickets] = useState(1);
   const [bookingLoading, setBookingLoading] = useState(false);
   const [bookingError, setBookingError] = useState("");
   const [bookingSuccess, setBookingSuccess] = useState("");
 
-  // 🔁 Fetch event details (reusable)
+  // 🔁 Fetch event details
   const fetchEvent = async () => {
     try {
       const response = await api.get(`/events/${id}/`);
@@ -30,8 +30,28 @@ function EventDetail() {
     fetchEvent();
   }, [id]);
 
+  // 🧠 EVENT STATUS LOGIC
+  const isPastEvent = event
+    ? new Date(`${event.event_date}T${event.event_time}`) < new Date()
+    : false;
+
+  const isSoldOut = event ? event.available_seats === 0 : false;
+
+  // 🟢🟡🔴 STATUS CONFIG
+  const getStatus = () => {
+    if (isPastEvent) {
+      return { text: "Event Over", color: "#d32f2f" };
+    }
+    if (isSoldOut) {
+      return { text: "Sold Out", color: "#f9a825" };
+    }
+    return { text: "Upcoming", color: "#2e7d32" };
+  };
+
+  const status = getStatus();
+
   const handleBooking = async () => {
-    if (bookingLoading) return; // 🛡️ double-click protection
+    if (bookingLoading || isPastEvent || isSoldOut) return;
 
     setBookingError("");
     setBookingSuccess("");
@@ -55,13 +75,27 @@ function EventDetail() {
       });
 
       setBookingSuccess("🎉 Booking successful!");
-      setTickets(1); // reset counter
-      fetchEvent();  // 🔁 refresh seats
+      setTickets(1);
+      fetchEvent();
     } catch (err) {
-      setBookingError(
-        err.response?.data?.detail ||
-        "❌ Booking failed or already booked."
-      );
+      const data = err.response?.data;
+      let message = "Booking failed. Please try again.";
+
+      if (data?.non_field_errors?.[0]) {
+        const backendMsg = data.non_field_errors[0].toLowerCase();
+
+        if (backendMsg.includes("already booked")) {
+          message = "You have already booked this event.";
+        } else if (backendMsg.includes("ended")) {
+          message = "This event is over. Past events cannot be booked.";
+        } else if (backendMsg.includes("seat")) {
+          message = "Not enough seats available.";
+        } else {
+          message = data.non_field_errors[0];
+        }
+      }
+
+      setBookingError(`❌ ${message}`);
     } finally {
       setBookingLoading(false);
     }
@@ -73,6 +107,21 @@ function EventDetail() {
 
   return (
     <div style={{ maxWidth: "600px", margin: "30px auto" }}>
+      {/* 🔴🟡🟢 STATUS BAR */}
+      <div
+        style={{
+          backgroundColor: status.color,
+          color: "white",
+          padding: "8px",
+          textAlign: "center",
+          fontWeight: "bold",
+          borderRadius: "6px",
+          marginBottom: "15px",
+        }}
+      >
+        {status.text}
+      </div>
+
       <h2>{event.title}</h2>
 
       <p>
@@ -89,13 +138,14 @@ function EventDetail() {
       </p>
 
       <p>
-        <strong>Description:</strong><br />
+        <strong>Description:</strong>
+        <br />
         {event.description}
       </p>
 
       <hr />
 
-      {/* 🎟️ TICKET COUNTER */}
+      {/* 🎟️ Ticket Counter */}
       <label>
         <strong>Tickets:</strong>
         <input
@@ -103,23 +153,30 @@ function EventDetail() {
           min="1"
           max={event.available_seats}
           value={tickets}
-          disabled={bookingLoading}
+          disabled={bookingLoading || isPastEvent || isSoldOut}
           onChange={(e) => setTickets(Number(e.target.value))}
           style={{ marginLeft: "10px", width: "70px" }}
         />
       </label>
 
-      <br /><br />
+      <br />
+      <br />
 
-      {/* 🎟️ BOOK BUTTON */}
+      {/* 🎟️ Book Button */}
       <button
         onClick={handleBooking}
-        disabled={bookingLoading || event.available_seats === 0}
+        disabled={bookingLoading || isPastEvent || isSoldOut}
       >
-        {bookingLoading ? "Booking..." : "Book Tickets"}
+        {isPastEvent
+          ? "Event Over"
+          : isSoldOut
+          ? "Sold Out"
+          : bookingLoading
+          ? "Booking..."
+          : "Book Tickets"}
       </button>
 
-      {/* 🔔 INLINE MESSAGES */}
+      {/* 🔔 Messages */}
       {bookingError && (
         <p style={{ color: "red", marginTop: "10px" }}>
           {bookingError}
